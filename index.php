@@ -23,11 +23,12 @@
 
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once('classes/archiveform.php');
+require_once('classes/archiver.php');
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
 
-$PAGE->set_context($context);
+$PAGE->set_context(context_system::instance());
 $PAGE->set_url(new moodle_url('/local/archiver/index.php'));
 $PAGE->set_title(get_string('pluginname', 'local_archiver'));
 $PAGE->set_heading(get_string('pluginname', 'local_archiver'));
@@ -38,6 +39,11 @@ $mform = new archive_form();
 if ($mform->is_cancelled()) {
     $mform->display();
 } else if ($fromform = $mform->get_data()) {
+    $formdata = $mform->get_data();
+    $controller = new archive_controller($formdata->categoryid, 'adhoc');
+
+    // TODO: create a page that shows completed and in-progress backups and redirect there
+    echo html_writer::tag('span', 'Your backup is being created!');
 
 } else {
     $mform->display();

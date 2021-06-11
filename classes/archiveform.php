@@ -36,7 +36,7 @@ class archive_form extends moodleform {
 
         $options = core_course_category::make_categories_list();
         $mform->addElement('select', 'categoryid', get_string('coursecategory'), $options);
-        $mform->setDefault('categoryid', $currentcategoryid);
+        $mform->setDefault('categoryid', 1);
         $mform->setType('categoryid', PARAM_INT);
 
         $this->add_action_buttons();
