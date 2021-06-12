@@ -26,6 +26,7 @@ namespace local_archiver;
 
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/moodle2/backup_plan_builder.class.php');
+require_once($CFG->dirroot . '/course/externallib.php');
 
 /**
  * The adhoc flavor of the archive task
@@ -53,6 +54,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
         $this->zip_and_delete_temp_dir();
         $this->upload_via_sftp_and_delete_zip();
+        \core_course_external::delete_courses($this->courses);
     }
 
     /**
