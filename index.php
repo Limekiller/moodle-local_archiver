@@ -22,8 +22,9 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once('classes/archiveform.php');
-require_once('classes/archiver.php');
+
+use local_archiver\archive_controller;
+use local_archiver\archive_form;
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
