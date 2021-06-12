@@ -53,7 +53,7 @@ class archive_controller {
     public function run_adhoc_task() {
         $courses = $this->get_courses_in_category();
         $archivetask = new adhoc_archive_task($courses);
-        $archivetask->execute();
+        \core\task\manager::queue_adhoc_task($archivetask);
     }
 
     /**
