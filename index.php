@@ -43,8 +43,7 @@ if ($mform->is_cancelled()) {
     $formdata = $mform->get_data();
     $controller = new archive_controller($formdata->categoryid, 'adhoc');
 
-    // TODO: create a page that shows completed and in-progress backups and redirect there
-    echo html_writer::tag('span', 'Your backup is being created!');
+    redirect('/local/archiver/jobs.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
 
 } else {
     $mform->display();

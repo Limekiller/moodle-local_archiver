@@ -44,7 +44,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
         $data = $this->get_custom_data();
         $this->courses = json_decode($data->courses, true); // An array of course ids
-        $this->tempfolderdest = $CFG->dataroot . '/archiver-backup-' . date('Ymdhms');
+        $this->tempfolderdest = $CFG->dataroot . '/archiver-backup-' . date('YmdHis');
 
         foreach ($this->courses as $course) {
             $this->make_backup($course);
@@ -54,6 +54,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
         $this->zip_and_delete_temp_dir();
         $this->upload_via_sftp_and_delete_zip();
+        $this->log_job_in_db();
         \core_course_external::delete_courses($this->courses);
     }
 
@@ -171,8 +172,18 @@ class adhoc_archive_task extends \core\task\adhoc_task {
             unlink($this->tempfolderdest . '.zip');
             throw new Exception('Login failed! Please check your SFTP credentials.');
         }
-        $sftp->put('archiver-backup-' . date('Ymdhms') .'.zip', $filename, NET_SFTP_LOCAL_FILE);
+        $sftp->put('archiver-backup-' . date('YmdHis') .'.zip', $filename, NET_SFTP_LOCAL_FILE);
         unlink($this->tempfolderdest . '.zip');
+    }
+
+    private function log_job_in_db() {
+        global $DB;
+
+        $job = new \stdClass();
+        $job->courses = json_encode($this->courses);
+        $job->type = 'adhoc';
+        $job->time = time();
+        $DB->insert_record('local_archiver', $job);
     }
 
 }
