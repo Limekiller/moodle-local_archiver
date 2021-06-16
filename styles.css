@@ -1,4 +1,7 @@
-th, td {
-    border: 1px solid black;
+table.archiver {
+    background: #f8f8f8;
+}
+table.archiver th, td {
+    border: 1px solid #cbcbcb;
     padding: 10px 15px;
 }

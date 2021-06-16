@@ -38,7 +38,7 @@ echo $OUTPUT->header();
 
 $mform = new archive_form();
 if ($mform->is_cancelled()) {
-    $mform->display();
+    redirect('/local/archiver/jobs.php');
 } else if ($fromform = $mform->get_data()) {
     $formdata = $mform->get_data();
     $controller = new archive_controller($formdata->categoryid, 'adhoc');

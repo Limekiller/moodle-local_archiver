@@ -39,7 +39,7 @@ $tasks = \local_archiver\tasks_table::get_previous_tasks();
 if ($inprogresstasks) {
     echo html_writer::tag('h2', 'In progress jobs');
     echo "
-    <table>
+    <table class='archiver'>
         <thead>
             <tr>
                 <th>Courses backed up</th>
@@ -64,7 +64,7 @@ if ($inprogresstasks) {
 
 echo html_writer::tag('h2', 'Previous jobs');
 echo "
-<table>
+<table class='archiver'>
     <thead>
         <tr>
             <th>Courses backed up</th>
