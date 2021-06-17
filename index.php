@@ -39,9 +39,9 @@ echo $OUTPUT->header();
 $mform = new archive_form();
 if ($mform->is_cancelled()) {
     redirect('/local/archiver/jobs.php');
-} else if ($fromform = $mform->get_data()) {
-    $formdata = $mform->get_data();
-    $controller = new archive_controller($formdata->categoryid, 'adhoc');
+} else if ($formdata = $mform->get_data()) {
+    $criteriatype = $formdata->selectiontype . 'criteria';
+    $controller = new archive_controller($formdata->selectiontype, $formdata->$criteriatype, 'adhoc');
 
     redirect('/local/archiver/jobs.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
 

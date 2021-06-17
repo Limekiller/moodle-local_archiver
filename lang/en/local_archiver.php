@@ -31,3 +31,10 @@ $string['sftphostname'] = 'Hostname';
 $string['sftpusername'] = 'Username';
 $string['sftppassword'] = 'Password';
 $string['sftpport'] = 'Port';
+
+$string['courseselectiontype'] = 'Course selection type';
+$string['coursecategory'] = 'Course category';
+$string['matchingstring'] = 'String to match';
+
+$string['nocourseerror1'] = 'No courses were found from the given criteria! ';
+$string['nocourseerror2'] = 'Try using fuzzy matching by adding a % before and after the course name. (Ex: %Chemistry%)';

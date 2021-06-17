@@ -35,15 +35,18 @@ use local_archiver\adhoc_archive_task;
 class archive_controller {
 
     private $tasktype;
-    private $categoryid;
+    private $criteria;
+    private $selectiontype;
 
     /**
-     * @param int $categoryid The category that we want to back up
+     * @param int $selectiontype The method for selecting courses to backup (category|matchingstring)
+     * @param mixed $criteria The criteria to use to select courses
      * @param string $tasktype Is this a cron run or an adhoc job? (scheduled|adhoc)
      */
-    public function __construct($categoryid, $tasktype) {
+    public function __construct($selectiontype, $criteria, $tasktype) {
         $this->tasktype = $tasktype;
-        $this->categoryid = $categoryid;
+        $this->criteria = $criteria;
+        $this->selectiontype = $selectiontype;
 
         if ($tasktype == 'adhoc') {
             $this->run_adhoc_task();
@@ -54,14 +57,27 @@ class archive_controller {
      * Run an adhoc task
      */
     public function run_adhoc_task() {
-        $courses = $this->get_courses_in_category();
-        $archivetask = new adhoc_archive_task($courses);
-
-        $coursearray = [];
-        foreach ($courses as $course) {
-            array_push($coursearray, $course->id);
+        if ($this->selectiontype === 'category') {
+            $coursearray = $this->get_courses_in_category($this->criteria);
+        } else {
+            $coursearray = $this->get_courses_by_string($this->criteria);
         }
 
+        // Throw an error if no courses were found
+        if (count($coursearray) === 0) {
+            $errormessage = get_string('nocourseerror1', 'local_archiver');
+            if ($this->selectiontype === 'matchingstring') {
+                $errormessage .= get_string('nocourseerror2', 'local_archiver');
+            }
+            throw new \moodle_exception(
+                'nocoursesfound', 
+                'local_archiver',
+                '', '',
+                $errormessage
+            );
+        }
+
+        $archivetask = new adhoc_archive_task($courses);
         $archivetask->set_custom_data([
             'courses' => json_encode($coursearray)
         ]);
@@ -70,11 +86,37 @@ class archive_controller {
 
     /**
      * Get all the courses in a category
-     * @return array $courses The list of courses in the category
+     * @param int $categoryid The ID of the category we want to get courses from
+     * @return array $coursearray The list of courses in the category
      */
-    private function get_courses_in_category() {
-        $cat = core_course_category::get($this->categoryid);
+    private function get_courses_in_category($categoryid) {
+        $cat = core_course_category::get($categoryid);
         $courses = $cat->get_courses();
-        return $courses;
+        $coursearray = [];
+        foreach ($courses as $course) {
+            array_push($coursearray, $course->id);
+        }
+        return $coursearray;
+    }
+
+    /**
+     * Get all courses matching a SQL-syntax string
+     * @param string $matchingstring The string to search for
+     * @return array $coursearray The list of courses matching that string
+     */
+    private function get_courses_by_string($matchingstring) {
+        global $DB;
+
+        $courses = $DB->get_records_select(
+            'course', 
+            "fullname like :matchingstring", 
+            ['matchingstring' => $matchingstring]
+        );
+
+        $coursearray = [];
+        foreach ($courses as $course) {
+            array_push($coursearray, $course->id);
+        }
+        return $coursearray;
     }
 }

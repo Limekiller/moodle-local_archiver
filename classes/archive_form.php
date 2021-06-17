@@ -37,11 +37,23 @@ class archive_form extends moodleform {
         global $CFG;
 
         $mform = $this->_form;
+        $courseselectiontype = optional_param('courseselectiontype',  'category',  PARAM_TEXT);
+        $mform->addElement('select', 'selectiontype', get_string('courseselectiontype', 'local_archiver'), [
+            'category' => 'Category',
+            'matchingstring' => 'Matching String'
+        ]);
+        $mform->setDefault('selectiontype', $courseselectiontype);
+        $mform->setType('selectiontype', PARAM_TEXT);
 
         $options = core_course_category::make_categories_list();
-        $mform->addElement('select', 'categoryid', get_string('coursecategory'), $options);
-        $mform->setDefault('categoryid', 1);
-        $mform->setType('categoryid', PARAM_INT);
+        $mform->addElement('select', 'categorycriteria', get_string('coursecategory', 'local_archiver'), $options);
+        $mform->setDefault('criteria', 1);
+        $mform->setType('criteria', PARAM_INT);
+        $mform->hideIf('categorycriteria', 'selectiontype', 'neq', 'category');
+
+        $mform->addElement('text', 'matchingstringcriteria', get_string('matchingstring', 'local_archiver'), []);
+        $mform->setType('matchingstringcriteria', PARAM_TEXT);
+        $mform->hideIf('matchingstringcriteria', 'selectiontype', 'neq', 'matchingstring');
 
         $this->add_action_buttons();
     }
