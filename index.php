@@ -40,11 +40,8 @@ $mform = new archive_form();
 if ($mform->is_cancelled()) {
     redirect('/local/archiver/jobs.php');
 } else if ($formdata = $mform->get_data()) {
-    $criteriatype = $formdata->selectiontype . 'criteria';
-    $controller = new archive_controller($formdata->selectiontype, $formdata->$criteriatype, 'adhoc');
-
+    $controller = new archive_controller($formdata, 'adhoc');
     redirect('/local/archiver/jobs.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
-
 } else {
     $mform->display();
 }

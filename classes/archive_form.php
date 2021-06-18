@@ -40,11 +40,15 @@ class archive_form extends moodleform {
         $courseselectiontype = optional_param('courseselectiontype',  'category',  PARAM_TEXT);
         $mform->addElement('select', 'selectiontype', get_string('courseselectiontype', 'local_archiver'), [
             'category' => 'Category',
-            'matchingstring' => 'Matching String'
+            'matchingstring' => 'Matching String',
+            'date' => 'Date'
         ]);
         $mform->setDefault('selectiontype', $courseselectiontype);
         $mform->setType('selectiontype', PARAM_TEXT);
 
+        // Each selection type corresponds to an input criteria
+        // Input criteria MUST be named like `$selectiontype . 'criteria'`
+        // See examples below
         $options = core_course_category::make_categories_list();
         $mform->addElement('select', 'categorycriteria', get_string('coursecategory', 'local_archiver'), $options);
         $mform->setDefault('criteria', 1);
@@ -54,6 +58,16 @@ class archive_form extends moodleform {
         $mform->addElement('text', 'matchingstringcriteria', get_string('matchingstring', 'local_archiver'), []);
         $mform->setType('matchingstringcriteria', PARAM_TEXT);
         $mform->hideIf('matchingstringcriteria', 'selectiontype', 'neq', 'matchingstring');
+
+        $mform->addElement('date_selector', 'datecriteria', get_string('date', 'local_archiver'));
+        $mform->setType('datecriteria', PARAM_TEXT);
+        $mform->hideIf('datecriteria', 'selectiontype', 'neq', 'date');
+        $mform->addElement('select', 'dateoperator', get_string('dateoperator', 'local_archiver'), [
+            '<' => '<',
+            '>' => '>'
+        ]);
+        $mform->setType('dateoperator', PARAM_RAW);
+        $mform->hideIf('dateoperator', 'selectiontype', 'neq', 'date');
 
         $this->add_action_buttons();
     }

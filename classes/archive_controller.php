@@ -35,18 +35,16 @@ use local_archiver\adhoc_archive_task;
 class archive_controller {
 
     private $tasktype;
-    private $criteria;
-    private $selectiontype;
+    private $data;
 
     /**
      * @param int $selectiontype The method for selecting courses to backup (category|matchingstring)
      * @param mixed $criteria The criteria to use to select courses
      * @param string $tasktype Is this a cron run or an adhoc job? (scheduled|adhoc)
      */
-    public function __construct($selectiontype, $criteria, $tasktype) {
+    public function __construct($data, $tasktype) {
         $this->tasktype = $tasktype;
-        $this->criteria = $criteria;
-        $this->selectiontype = $selectiontype;
+        $this->data = $data;
 
         if ($tasktype == 'adhoc') {
             $this->run_adhoc_task();
@@ -57,16 +55,18 @@ class archive_controller {
      * Run an adhoc task
      */
     public function run_adhoc_task() {
-        if ($this->selectiontype === 'category') {
-            $coursearray = $this->get_courses_in_category($this->criteria);
+        if ($this->data->selectiontype === 'category') {
+            $coursearray = $this->get_courses_in_category($this->data->categorycriteria);
+        } elseif ($this->data->selectiontype === 'matchingstring') {
+            $coursearray = $this->get_courses_by_string($this->data->matchingstringcriteria);
         } else {
-            $coursearray = $this->get_courses_by_string($this->criteria);
+            $coursearray = $this->get_courses_by_date($this->data->datecriteria, $this->data->dateoperator);
         }
 
         // Throw an error if no courses were found
         if (count($coursearray) === 0) {
             $errormessage = get_string('nocourseerror1', 'local_archiver');
-            if ($this->selectiontype === 'matchingstring') {
+            if ($this->data->selectiontype === 'matchingstring') {
                 $errormessage .= get_string('nocourseerror2', 'local_archiver');
             }
             throw new \moodle_exception(
@@ -111,6 +111,27 @@ class archive_controller {
             'course', 
             "fullname like :matchingstring", 
             ['matchingstring' => $matchingstring]
+        );
+
+        $coursearray = [];
+        foreach ($courses as $course) {
+            array_push($coursearray, $course->id);
+        }
+        return $coursearray;
+    }
+
+    /**
+     * Get all courses before or after a given date
+     * @param string $matchingstring The string to search for
+     * @return array $coursearray The list of courses matching that string
+     */
+    private function get_courses_by_date($date, $dateoperator) {
+        global $DB;
+
+        $courses = $DB->get_records_select(
+            'course', 
+            "timecreated $dateoperator :matchingstring AND id != 1", 
+            ['matchingstring' => $date]
         );
 
         $coursearray = [];

@@ -31,7 +31,7 @@ class tasks_table {
     public static function get_previous_tasks() {
         global $DB;
 
-        $tasks = $DB->get_records('local_archiver');
+        $tasks = $DB->get_records('local_archiver', null, 'time DESC');
         return array_values($tasks);
     }
 
@@ -39,12 +39,9 @@ class tasks_table {
         global $DB;
 
         $tasks = $DB->get_records_sql("
-            SELECT
-                id, customdata, timecreated
-            FROM
-                {task_adhoc}
-            WHERE
-                classname LIKE '%adhoc_archive_task%'"
+            SELECT id, customdata, timecreated
+            FROM {task_adhoc}
+            WHERE classname LIKE '%adhoc_archive_task%'"
         );
         return $tasks;
         return array_values($tasks);
