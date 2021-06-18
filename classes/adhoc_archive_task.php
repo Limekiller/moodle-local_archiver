@@ -47,9 +47,15 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         $this->tempfolderdest = $CFG->dataroot . '/archiver-backup-' . date('YmdHis');
 
         foreach ($this->courses as $course) {
-            $this->make_backup($course);
-            $fileinfo = $this->get_file_info_from_db($course);
-            $this->move_file($fileinfo);
+            try {
+                $this->make_backup($course);
+                $fileinfo = $this->get_file_info_from_db($course);
+                $this->move_file($fileinfo);
+            } catch (\Exception $e) {
+                # Skip this course for archival.
+                # TODO: Log error to some persistent log
+                continue;
+            }
         }
 
         $this->zip_and_delete_temp_dir();
