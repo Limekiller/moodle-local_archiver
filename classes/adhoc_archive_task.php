@@ -40,7 +40,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
      * Run the archival job
      */
     public function execute() {
-        global $CFG;
+        global $CFG, $DB;
 
         $data = $this->get_custom_data();
         $this->courses = json_decode($data->courses, true); // An array of course ids
@@ -58,10 +58,16 @@ class adhoc_archive_task extends \core\task\adhoc_task {
             }
         }
 
-        $this->zip_and_delete_temp_dir();
-        $this->upload_via_sftp_and_delete_zip();
-        $this->log_job_in_db('Success.');
-        \core_course_external::delete_courses($this->courses);
+        try {
+            $this->zip_and_delete_temp_dir();
+            $this->upload_via_sftp_and_delete_zip();
+            $this->log_job_in_db('Success.');
+            \core_course_external::delete_courses($this->courses);
+        } catch (\Exception $e) {
+            unlink($this->tempfolderdest . '.zip');
+            $DB->delete_records('task_adhoc', ['id' => $this->get_id()]);
+            $this->log_job_in_db($e->getMessage());
+        }
     }
 
     /**
@@ -176,12 +182,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         // TODO: Move connection check to beginning so we don't waste resources on a big job before discovering we can't upload.
         $sftp = new \Net_SFTP($sftphostname, $sftpport);
         if (!$sftp->login($sftpusername, $sftppassword)) {
-            unlink($this->tempfolderdest . '.zip');
-            $DB->delete_records('task_adhoc', ['id' => $this->get_id()]);
-
-            $error = get_string('sftperror', 'local_archiver');
-            $this->log_job_in_db($error);
-            throw new \Exception($error);
+            throw new \Exception(get_string('sftperror', 'local_archiver'));
         }
         $sftp->put('archiver-backup-' . date('YmdHis') .'.zip', $filename, NET_SFTP_LOCAL_FILE);
         unlink($this->tempfolderdest . '.zip');

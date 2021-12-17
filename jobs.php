@@ -38,56 +38,31 @@ $tasks = \local_archiver\tasks_table::get_previous_tasks();
 
 if ($inprogresstasks) {
     echo html_writer::tag('h2', 'In progress jobs');
-    echo "
-    <table class='archiver'>
-        <thead>
-            <tr>
-                <th>Courses backed up</th>
-                <th>Time started</th>
-            </tr>
-        </thead>
-        <tbody>";
-            foreach ($inprogresstasks as $task) {
-                $customdata = json_decode($task->customdata, true);
-                $courses = $customdata['courses'];
-                echo "
-                <tr>
-                    <td>$courses</td>
-                    <td>" . date("Y-m-d H:i:s", $task->timecreated) . "</td>
-                </tr>";
-            }
-        echo "
-        </tbody>
-    </table>";
-    echo html_writer::tag('br', '');
+    $current_jobs_table = new html_table();
+    $current_jobs_table->head = ['Courses backed up', 'Time started'];
+    foreach ($inprogresstasks as $task) {
+        $customdata = json_decode($task->customdata, true);
+        $courses = $customdata['courses'];
+        $current_jobs_table->data[] = [$courses, date("Y-m-d H:i:s", $task->timecreated)];
+    }
+
+    echo html_writer::table($current_jobs_table);
+    echo '<br /><br />';
 }
 
 echo html_writer::tag('h2', 'Previous jobs');
-echo "
-<table class='archiver'>
-    <thead>
-        <tr>
-            <th>Status</th>
-            <th>Courses backed up</th>
-            <th>Archive type</th>
-            <th>Time completed</th>
-            <th>Message</th>
-        </tr>
-    </thead>
-    <tbody>";
-        foreach ($tasks as $task) {
-            $pix_icon_vals = $task->message == 'Success.' ? ['i/valid', 'Success'] : ['i/invalid', 'Failure'];
-            echo "
-            <tr>
-                <td>".$OUTPUT->pix_icon($pix_icon_vals[0], $pix_icon_vals[1])."</td>
-                <td>$task->courses</td>
-                <td>$task->type</td>
-                <td>" . date("Y-m-d H:i:s", $task->time) . "</td>
-                <td>$task->message</td>
-            </tr>";
-        }
-    echo "
-    </tbody>
-</table>";
+$previous_jobs_table = new html_table();
+$previous_jobs_table->head = ['Status', 'Courses backed up', 'Archive type', 'Time completed', 'Message'];
+foreach ($tasks as $task) {
+    $pix_icon_vals = $task->message == 'Success.' ? ['i/valid', 'Success'] : ['i/invalid', 'Failure'];
+    $previous_jobs_table->data[] = [
+        $OUTPUT->pix_icon($pix_icon_vals[0], $pix_icon_vals[1]),
+        $task->courses,
+        $task->type,
+        date("Y-m-d H:i:s", $task->time),
+        $task->message
+    ];
+}
+echo html_writer::table($previous_jobs_table);
 
 echo $OUTPUT->footer();
