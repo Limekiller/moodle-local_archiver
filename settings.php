@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('localplugins', new admin_category('local_archiver_settings', get_string('pluginname', 'local_archiver')));
-    $settingspage = new admin_settingpage('managelocalarchiver', get_string('manage', 'local_archiver'));
+    $ADMIN->add('localplugins', new admin_category('archiversettings', get_string('pluginname', 'local_archiver')));
+    $settingspage = new admin_settingpage('managearchiver', get_string('manage', 'local_archiver'));
 
     if ($ADMIN->fulltree) {
 
@@ -73,4 +73,22 @@ if ($hassiteconfig) {
     }
 
     $ADMIN->add('localplugins', $settingspage);
+
+    $ADMIN->add(
+        'courses',
+        new admin_externalpage(
+            'archiver',
+            get_string('archivecourses', 'local_archiver'),
+            new \moodle_url('/local/archiver')
+        )
+    );
+
+    $ADMIN->add(
+        'localplugins',
+        new admin_externalpage(
+            'archiverjobs',
+            get_string('logs', 'local_archiver'),
+            new \moodle_url('/local/archiver/jobs.php')
+        )
+    );
 }

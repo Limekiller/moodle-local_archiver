@@ -60,7 +60,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
         $this->zip_and_delete_temp_dir();
         $this->upload_via_sftp_and_delete_zip();
-        $this->log_job_in_db();
+        $this->log_job_in_db('Success.');
         \core_course_external::delete_courses($this->courses);
     }
 
@@ -158,6 +158,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
      * Upload the .zip file via SFTP and then delete the .zip file
      */
     private function upload_via_sftp_and_delete_zip() {
+        global $DB;
         set_include_path(__DIR__ . '/../lib/phpseclib');
         require_once('Net/SFTP.php');
 
@@ -176,20 +177,25 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         $sftp = new \Net_SFTP($sftphostname, $sftpport);
         if (!$sftp->login($sftpusername, $sftppassword)) {
             unlink($this->tempfolderdest . '.zip');
-            throw new Exception('Login failed! Please check your SFTP credentials.');
+            $DB->delete_records('task_adhoc', ['id' => $this->get_id()]);
+
+            $error = get_string('sftperror', 'local_archiver');
+            $this->log_job_in_db($error);
+            throw new \Exception($error);
         }
         $sftp->put('archiver-backup-' . date('YmdHis') .'.zip', $filename, NET_SFTP_LOCAL_FILE);
         unlink($this->tempfolderdest . '.zip');
     }
 
-    private function log_job_in_db() {
+    private function log_job_in_db($message) {
         global $DB;
 
         $job = new \stdClass();
         $job->courses = json_encode($this->courses);
         $job->type = 'adhoc';
         $job->time = time();
-        $DB->insert_record('local_archiver', $job);
+        $job->message = $message;
+        $DB->insert_record('archiver_log', $job);
     }
 
 }

@@ -77,7 +77,7 @@ class archive_controller {
             );
         }
 
-        $archivetask = new adhoc_archive_task($courses);
+        $archivetask = new adhoc_archive_task($coursearray);
         $archivetask->set_custom_data([
             'courses' => json_encode($coursearray)
         ]);

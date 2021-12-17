@@ -22,8 +22,10 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Moonami Archiver';
+$string['pluginname'] = 'Archiver';
 $string['manage'] = 'Manage Archiver';
+$string['archivecourses'] = 'Archive courses';
+$string['logs'] = 'Archiver logs';
 
 $string['archivemethod'] = 'Archival method';
 $string['sftpheading'] = 'SFTP Settings';
@@ -40,3 +42,4 @@ $string['dateoperator'] = 'Operator';
 
 $string['nocourseerror1'] = 'No courses were found from the given criteria! ';
 $string['nocourseerror2'] = 'Try using fuzzy matching by adding a % before and after the course name. (Ex: %Chemistry%)';
+$string['sftperror'] = 'Could not connect to SFTP server. Please check your SFTP credentials.';

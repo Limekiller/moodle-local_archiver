@@ -31,7 +31,7 @@ class tasks_table {
     public static function get_previous_tasks() {
         global $DB;
 
-        $tasks = $DB->get_records('local_archiver', null, 'time DESC');
+        $tasks = $DB->get_records('archiver_log', null, 'time DESC');
         return array_values($tasks);
     }
 

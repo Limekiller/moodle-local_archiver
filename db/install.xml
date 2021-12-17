@@ -4,12 +4,13 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_archiver" COMMENT="This table keeps track of previous archival jobs.">
+    <TABLE NAME="archiver_log" COMMENT="This table keeps track of previous archival jobs.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courses" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="A list of the courses archived in this job"/>
         <FIELD NAME="type" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The archival type"/>
         <FIELD NAME="time" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="0" COMMENT="The time this archival was completed"/>
+        <FIELD NAME="message" TYPE="text" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Any messages associated with the job"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
