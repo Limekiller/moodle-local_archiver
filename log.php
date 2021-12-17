@@ -22,19 +22,19 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require "$CFG->libdir/tablelib.php";
 
 require_login();
 require_capability('moodle/site:config', context_system::instance());
 
 $PAGE->set_context(context_system::instance());
-$PAGE->set_url(new moodle_url('/local/archiver/jobs.php'));
+$PAGE->set_url(new moodle_url('/local/archiver/log.php'));
 $PAGE->set_title(get_string('pluginname', 'local_archiver'));
 $PAGE->set_heading(get_string('pluginname', 'local_archiver'));
 
 echo $OUTPUT->header();
 
-$inprogresstasks = \local_archiver\tasks_table::get_current_tasks();
-$tasks = \local_archiver\tasks_table::get_previous_tasks();
+$inprogresstasks = \local_archiver\log_table::get_current_tasks();
 
 if ($inprogresstasks) {
     echo html_writer::tag('h2', 'In progress jobs');
@@ -50,19 +50,10 @@ if ($inprogresstasks) {
     echo '<br /><br />';
 }
 
-echo html_writer::tag('h2', 'Previous jobs');
-$previous_jobs_table = new html_table();
-$previous_jobs_table->head = ['Status', 'Courses backed up', 'Archive type', 'Time completed', 'Message'];
-foreach ($tasks as $task) {
-    $pix_icon_vals = $task->message == 'Success.' ? ['i/valid', 'Success'] : ['i/invalid', 'Failure'];
-    $previous_jobs_table->data[] = [
-        $OUTPUT->pix_icon($pix_icon_vals[0], $pix_icon_vals[1]),
-        $task->courses,
-        $task->type,
-        date("Y-m-d H:i:s", $task->time),
-        $task->message
-    ];
-}
-echo html_writer::table($previous_jobs_table);
+echo html_writer::tag('h2', 'Completed jobs');
+$table = new \local_archiver\log_table('uniqueid');
+$table->set_sql('*', "{archiver_log}", '1=1');
+$table->define_baseurl("$CFG->wwwroot/local/archiver/log.php");
+$table->out(10, true);
 
 echo $OUTPUT->footer();

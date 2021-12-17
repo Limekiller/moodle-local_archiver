@@ -26,13 +26,34 @@ namespace local_archiver;
 
 defined('MOODLE_INTERNAL') || die;
 
-class tasks_table {
+class log_table extends \table_sql {
 
-    public static function get_previous_tasks() {
-        global $DB;
+    function __construct($uniqueid) {
+        parent::__construct($uniqueid);
+        // Define the list of columns to show.
+        $columns = array('status', 'courses', 'time', 'message');
+        $this->define_columns($columns);
 
-        $tasks = $DB->get_records('archiver_log', null, 'time DESC');
-        return array_values($tasks);
+        // Define the titles of columns to show in header.
+        $headers = array('Status', 'Courses backed up', 'Time completed', 'Message');
+        $this->define_headers($headers);
+    }
+
+    public function col_time($task) {
+        return date("Y-m-d H:i:s", $task->time);
+    }
+
+    public function other_cols($colname, $task) {
+        // For security reasons we don't want to show the password hash.
+        if ($colname == 'status') {
+            $fa_icon = 'fa-check';
+            $icon_color = 'green';
+            if ($task->message !== 'Success.') {
+                $fa_icon = 'fa-times';
+                $icon_color = 'red';
+            }
+            return "<i class='icon fa $fa_icon fa-fw' style='color:$icon_color;'></i>";
+        }
     }
 
     public static function get_current_tasks() {
