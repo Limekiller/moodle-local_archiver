@@ -32,6 +32,9 @@ $PAGE->set_url(new moodle_url('/local/archiver/log.php'));
 $PAGE->set_title(get_string('pluginname', 'local_archiver'));
 $PAGE->set_heading(get_string('pluginname', 'local_archiver'));
 
+$PAGE->navbar->add(get_string('archivecourses', 'local_archiver'), new moodle_url('/local/archiver/index.php'));
+$PAGE->navbar->add(get_string('logs', 'local_archiver'), new moodle_url('/local/archiver/log.php'));
+
 echo $OUTPUT->header();
 
 $inprogresstasks = \local_archiver\log_table::get_current_tasks();

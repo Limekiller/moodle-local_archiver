@@ -34,14 +34,16 @@ $PAGE->set_url(new moodle_url('/local/archiver/index.php'));
 $PAGE->set_title(get_string('pluginname', 'local_archiver'));
 $PAGE->set_heading(get_string('pluginname', 'local_archiver'));
 
+$PAGE->navbar->add(get_string('archivecourses', 'local_archiver'), new moodle_url('/local/archiver/index.php'));
+
 echo $OUTPUT->header();
 
 $mform = new archive_form();
 if ($mform->is_cancelled()) {
-    redirect('/local/archiver/jobs.php');
+    redirect('/local/archiver/log.php');
 } else if ($formdata = $mform->get_data()) {
     $controller = new archive_controller($formdata, 'adhoc');
-    redirect('/local/archiver/jobs.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect('/local/archiver/log.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
 } else {
     $mform->display();
 }

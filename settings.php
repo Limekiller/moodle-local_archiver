@@ -88,7 +88,7 @@ if ($hassiteconfig) {
         new admin_externalpage(
             'archiverjobs',
             get_string('logs', 'local_archiver'),
-            new \moodle_url('/local/archiver/jobs.php')
+            new \moodle_url('/local/archiver/log.php')
         )
     );
 }
