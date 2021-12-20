@@ -18,7 +18,7 @@
  * Adds admin settings for the plugin.
  *
  * @package     local_archiver
- * @copyright   2021 Moonami
+ * @copyright   2021 Bryce Yoder
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

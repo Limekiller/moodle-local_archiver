@@ -15,9 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Allow user to create new archival jobs
+ * 
  * @package   local_archiver
- * @copyright 2021 Moonami
+ * @copyright 2021 Bryce Yoder
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -36,8 +37,6 @@ $PAGE->set_heading(get_string('pluginname', 'local_archiver'));
 
 $PAGE->navbar->add(get_string('archivecourses', 'local_archiver'), new moodle_url('/local/archiver/index.php'));
 
-echo $OUTPUT->header();
-
 $mform = new archive_form();
 if ($mform->is_cancelled()) {
     redirect('/local/archiver/log.php');
@@ -45,6 +44,7 @@ if ($mform->is_cancelled()) {
     $controller = new archive_controller($formdata, 'adhoc');
     redirect('/local/archiver/log.php', 'Your backup is being created!', null, \core\output\notification::NOTIFY_SUCCESS);
 } else {
+    echo $OUTPUT->header();
     $mform->display();
 }
 

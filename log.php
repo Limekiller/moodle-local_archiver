@@ -15,9 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- *
+ * Log page of in-progress and completed jobs
+ * 
  * @package   local_archiver
- * @copyright 2021 Moonami
+ * @copyright 2021 Bryce Yoder
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,7 +41,7 @@ echo $OUTPUT->header();
 $inprogresstasks = \local_archiver\log_table::get_current_tasks();
 
 if ($inprogresstasks) {
-    echo html_writer::tag('h2', 'In progress jobs');
+    echo html_writer::tag('h3', 'In progress jobs');
     $current_jobs_table = new html_table();
     $current_jobs_table->head = ['Courses backed up', 'Time started'];
     foreach ($inprogresstasks as $task) {
@@ -53,9 +54,9 @@ if ($inprogresstasks) {
     echo '<br /><br />';
 }
 
-echo html_writer::tag('h2', 'Completed jobs');
+echo html_writer::tag('h3', 'Completed jobs');
 $table = new \local_archiver\log_table('uniqueid');
-$table->set_sql('*', "{archiver_log}", '1=1');
+$table->set_sql('*', "{archiver_log}", '1=1 ORDER BY time DESC');
 $table->define_baseurl("$CFG->wwwroot/local/archiver/log.php");
 $table->out(10, true);
 

@@ -20,7 +20,7 @@ namespace local_archiver;
  * Archiver plugin archive form.
  *
  * @package     local_archiver
- * @copyright   2021 Moonami
+ * @copyright   2021 Bryce Yoder
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -17,13 +17,13 @@
 /**
  *
  * @package   local_archiver
- * @copyright 2021 Moonami
+ * @copyright 2021 Bryce Yoder
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021061204;
+$plugin->version   = 2021121701;
 $plugin->component = 'local_archiver';
 $plugin->maturity  = MATURITY_ALPHA;
-$plugin->release   = '0.1';
+$plugin->release   = '0.5';

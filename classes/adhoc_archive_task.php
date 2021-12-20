@@ -20,7 +20,7 @@ namespace local_archiver;
  * Archiver plugin archive form.
  *
  * @package     local_archiver
- * @copyright   2021 Moonami
+ * @copyright   2021 Bryce Yoder
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -50,7 +50,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
             try {
                 $this->make_backup($course);
                 $fileinfo = $this->get_file_info_from_db($course);
-                $this->move_file($fileinfo);
+                $this->move_file($fileinfo, $course);
             } catch (\Exception $e) {
                 # Skip this course for archival.
                 # TODO: Log error to some persistent log
@@ -76,6 +76,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
      * @return bool
      */
     private function make_backup($courseid) {
+
         $bc = new \backup_controller(\backup::TYPE_1COURSE,
             $courseid,
             \backup::FORMAT_MOODLE,
@@ -123,7 +124,12 @@ class adhoc_archive_task extends \core\task\adhoc_task {
      * Move the backup file to a temp directory in moodledata
      * @param object $fileinfo The file information
      */
-    private function move_file($fileinfo) {
+    private function move_file($fileinfo, $courseid) {
+        global $DB;
+
+        $courseinfo = $DB->get_record('course', ['id' => $courseid]);
+        $filename = "$courseid-$courseinfo->fullname.mbz";
+
         $fs = get_file_storage();
         $file = $fs->get_file(
             $fileinfo->contextid,
@@ -137,7 +143,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         if (!file_exists($this->tempfolderdest)) {
             mkdir($this->tempfolderdest);
         }
-        $file->copy_content_to($this->tempfolderdest . '/' . $fileinfo->contextid . $file->get_filename());
+        $file->copy_content_to("$this->tempfolderdest/$filename");
     }
 
     /**
