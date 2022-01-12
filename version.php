@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021121701;
+$plugin->version   = 2022011202;
 $plugin->component = 'local_archiver';
 $plugin->maturity  = MATURITY_ALPHA;
 $plugin->release   = '0.5';

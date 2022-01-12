@@ -79,6 +79,7 @@ class archive_controller {
 
         $archivetask = new adhoc_archive_task($coursearray);
         $archivetask->set_custom_data([
+            'archivetype' => $this->data->archivetype,
             'courses' => json_encode($coursearray)
         ]);
         \core\task\manager::queue_adhoc_task($archivetask);

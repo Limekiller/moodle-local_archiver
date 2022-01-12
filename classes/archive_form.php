@@ -37,6 +37,14 @@ class archive_form extends moodleform {
         global $CFG;
 
         $mform = $this->_form;
+        $archivetype = optional_param('archivetype',  'category',  PARAM_TEXT);
+        $mform->addElement('select', 'archivetype', get_string('archivetype', 'local_archiver'), [
+            'sftp' => 'SFTP',
+            'drive' => 'Google Drive',
+        ]);
+        $mform->setDefault('archivetype', $courseselectiontype);
+        $mform->setType('archivetype', PARAM_TEXT);
+
         $courseselectiontype = optional_param('courseselectiontype',  'category',  PARAM_TEXT);
         $mform->addElement('select', 'selectiontype', get_string('courseselectiontype', 'local_archiver'), [
             'category' => 'Category',

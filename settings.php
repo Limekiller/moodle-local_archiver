@@ -24,22 +24,19 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+use local_archiver\google_oauth_manager;
+
 if ($hassiteconfig) {
     $ADMIN->add('localplugins', new admin_category('archiversettings', get_string('pluginname', 'local_archiver')));
     $settingspage = new admin_settingpage('managearchiver', get_string('manage', 'local_archiver'));
 
-    if ($ADMIN->fulltree) {
+    $saved_token = google_oauth_manager::fetch_access_token();
+    $google_oauth_access_token = json_decode($saved_token, true)['access_token'];
+    if (!$saved_token) {
+        $google_oauth_access_token = 'Not set';
+    }
 
-        $archivemethodoptions = [
-            'SFTP'
-        ];
-        $settingspage->add(new admin_setting_configselect(
-            'local_archiver/archive_method',
-            get_string('archivemethod', 'local_archiver'),
-            '',
-            'SFTP',
-            $archivemethodoptions
-        ));
+    if ($ADMIN->fulltree) {
 
         $settingspage->add(new admin_setting_heading(
             'local_archiver/SFTP',
@@ -69,6 +66,39 @@ if ($hassiteconfig) {
             get_string('sftpport', 'local_archiver'),
             '',
             '22'
+        ));
+
+        $settingspage->add(new admin_setting_heading(
+            'local_archiver/drive',
+            get_string('googledriveheading', 'local_archiver'),
+            ''
+        ));
+
+        $settingspage->add(new admin_setting_configtext(
+            'local_archiver/googleoauthclientid',
+            get_string('googleoauthclientid', 'local_archiver'),
+            '',
+            ''
+        ));
+
+        $settingspage->add(new admin_setting_configpasswordunmask(
+            'local_archiver/googleoauthclientsecret',
+            get_string('googleoauthclientsecret', 'local_archiver'),
+            '',
+            ''
+        ));
+
+        $settingspage->add(new admin_setting_configempty(
+            'local_archiver/googleoauthaccesstoken',
+            get_string('generategoogleoauthaccesstoken', 'local_archiver', $CFG->wwwroot),
+            '',
+            ''
+        ));
+
+        $settingspage->add(new admin_setting_description(
+            'local_archiver/viewgoogleoauthaccesstoken',
+            get_string('googleoauthaccesstoken', 'local_archiver', $google_oauth_access_token),
+            ''
         ));
     }
 

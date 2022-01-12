@@ -28,6 +28,8 @@ require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/moodle2/backup_plan_builder.class.php');
 require_once($CFG->dirroot . '/course/externallib.php');
 
+use local_archiver\google_oauth_manager;
+
 /**
  * The adhoc flavor of the archive task
  */
@@ -35,6 +37,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
     private $courses;
     private $tempfolderdest;
+    private $archivetype;
 
     /**
      * Run the archival job
@@ -45,6 +48,7 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         $data = $this->get_custom_data();
         $this->courses = json_decode($data->courses, true); // An array of course ids
         $this->tempfolderdest = $CFG->dataroot . '/archiver-backup-' . date('YmdHis');
+        $this->archivetype = $data->archivetype;
 
         foreach ($this->courses as $course) {
             try {
@@ -60,7 +64,11 @@ class adhoc_archive_task extends \core\task\adhoc_task {
 
         try {
             $this->zip_and_delete_temp_dir();
-            $this->upload_via_sftp_and_delete_zip();
+
+            // Dynamically call upload method based on archive type
+            $upload_method = "upload_via_$this->archivetype" . "_and_delete_zip";
+            $this->$upload_method();
+
             $this->log_job_in_db('Success.');
             \core_course_external::delete_courses($this->courses);
         } catch (\Exception $e) {
@@ -191,6 +199,25 @@ class adhoc_archive_task extends \core\task\adhoc_task {
             throw new \Exception(get_string('sftperror', 'local_archiver'));
         }
         $sftp->put('archiver-backup-' . date('YmdHis') .'.zip', $filename, NET_SFTP_LOCAL_FILE);
+        unlink($this->tempfolderdest . '.zip');
+    }
+
+    private function upload_via_drive_and_delete_zip() {
+        require __DIR__ . '/../lib/google-api-php-client/vendor/autoload.php';
+        $client = google_oauth_manager::get_client();
+
+        $filename = $this->tempfolderdest . '.zip';
+        $service = new \Google_Service_Drive($client);
+        $fileMetadata = new \Google_Service_Drive_DriveFile(
+            array('name' => 'archiver-backup-' . date('YmdHis'))
+        );
+        $content = file_get_contents($filename);
+        $mimeType = mime_content_type($filename);
+        $file = $service->files->create($fileMetadata, array(
+            'data' => $content,
+            'mimeType' => $mimeType,
+            'fields' => 'id'));
+
         unlink($this->tempfolderdest . '.zip');
     }
 

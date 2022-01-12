@@ -33,7 +33,13 @@ $string['sftphostname'] = 'Hostname';
 $string['sftpusername'] = 'Username';
 $string['sftppassword'] = 'Password';
 $string['sftpport'] = 'Port';
+$string['googledriveheading'] = 'Google Drive settings';
+$string['googleoauthclientid'] = 'Client ID';
+$string['googleoauthclientsecret'] = 'Client Secret';
+$string['googleoauthaccesstoken'] = 'Google OAuth access token: {$a}';
+$string['generategoogleoauthaccesstoken'] = '<br /><a href="{$a}/local/archiver/oauth.php" class="btn btn-primary">Click here to authorize Google</a><br />';
 
+$string['archivetype'] = 'Archival method';
 $string['courseselectiontype'] = 'Course selection type';
 $string['coursecategory'] = 'Course category';
 $string['matchingstring'] = 'String to match';
@@ -43,3 +49,4 @@ $string['dateoperator'] = 'Operator';
 $string['nocourseerror1'] = 'No courses were found from the given criteria! ';
 $string['nocourseerror2'] = 'Try using fuzzy matching by adding a % before and after the course name. (Ex: %Chemistry%)';
 $string['sftperror'] = 'Could not connect to SFTP server. Please check your SFTP credentials.';
+$string['googleoautherror'] = 'Google access token does not exist or could not be refreshed. Please re-grant account access in plugin settings.';
