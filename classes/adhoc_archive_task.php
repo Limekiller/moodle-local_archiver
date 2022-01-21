@@ -203,20 +203,25 @@ class adhoc_archive_task extends \core\task\adhoc_task {
     }
 
     private function upload_via_drive_and_delete_zip() {
-        require __DIR__ . '/../lib/google-api-php-client/vendor/autoload.php';
+        global $CFG;
+        require_once "$CFG->libdir/google/src/Google/autoload.php";
+        
         $client = google_oauth_manager::get_client();
 
         $filename = $this->tempfolderdest . '.zip';
-        $service = new \Google_Service_Drive($client);
-        $fileMetadata = new \Google_Service_Drive_DriveFile(
-            array('name' => 'archiver-backup-' . date('YmdHis'))
-        );
         $content = file_get_contents($filename);
         $mimeType = mime_content_type($filename);
-        $file = $service->files->create($fileMetadata, array(
+
+        $file = new \Google_Service_Drive_DriveFile();
+        $file->setTitle('archiver-backup-' . date('YmdHis') . '.zip');
+        $file->setMimeType($mimeType);
+
+        $service = new \Google_Service_Drive($client);
+        $file = $service->files->insert($file, array(
             'data' => $content,
             'mimeType' => $mimeType,
-            'fields' => 'id'));
+            'uploadType' => 'media')
+        );
 
         unlink($this->tempfolderdest . '.zip');
     }

@@ -26,7 +26,7 @@ namespace local_archiver;
 
 defined('MOODLE_INTERNAL') || die;
 
-require "$CFG->libdir/google/src/Google/autoload.php";
+require_once "$CFG->libdir/google/src/Google/autoload.php";
 
 class google_oauth_manager {
 
@@ -52,7 +52,7 @@ class google_oauth_manager {
         }
 
         if ($code) {
-            $access_token = $client->fetchAccessTokenWithAuthCode($code);
+            $access_token = $client->authenticate($code);
             $client->setAccessToken($access_token);
             // Check to see if there was an error.
             if (array_key_exists('error', $access_token)) {
@@ -96,7 +96,13 @@ class google_oauth_manager {
             $fields=$field, 
             $strictness=IGNORE_MISSING
         );
-        return $access_token->$field;
+        
+        $return_val = $access_token->$field;
+        if (!$id) {
+            $return_val = json_decode($return_val, true);
+        }
+
+        return $return_val;
     }
 
     private static function save_access_token($token) {

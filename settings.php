@@ -96,9 +96,21 @@ if ($hassiteconfig) {
         ));
 
         $settingspage->add(new admin_setting_description(
+            'local_archiver/spacer',
+            "",
+            ""
+        ));
+
+        $settingspage->add(new admin_setting_description(
             'local_archiver/viewgoogleoauthaccesstoken',
-            get_string('googleoauthaccesstoken', 'local_archiver', $google_oauth_access_token),
-            ''
+            get_string('googleoauthaccesstoken', 'local_archiver'),
+            "$google_oauth_access_token"
+        ));
+
+        $settingspage->add(new admin_setting_description(
+            'local_archiver/spacer2',
+            "",
+            ""
         ));
     }
 

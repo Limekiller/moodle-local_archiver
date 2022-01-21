@@ -36,9 +36,16 @@ $string['sftpport'] = 'Port';
 $string['googledriveheading'] = 'Google Drive settings';
 $string['googleoauthclientid'] = 'Client ID';
 $string['googleoauthclientsecret'] = 'Client Secret';
-$string['googleoauthaccesstoken'] = 'Google OAuth access token: {$a}';
-$string['generategoogleoauthaccesstoken'] = '<br /><a href="{$a}/local/archiver/oauth.php" class="btn btn-primary">Click here to authorize Google</a><br />';
-
+$string['googleoauthaccesstoken'] = '<br />Google OAuth access token';
+$string['generategoogleoauthaccesstoken'] = '
+    <br />
+    <a href="{$a}/local/archiver/oauth.php" class="btn btn-primary">Click here to authorize Google</a>
+    <br /><br />
+    <i class="icon fa fa-exclamation-circle fa-fw" style="color:red;"></i>
+    <h6 style="font-size:12px;display:inline;">
+        You must add <br /><span style="font-weight:bold;">{$a}/local/archiver/oauth.php</span><br /> as an authorized redirect URI in your OAuth client settings
+    </h6>
+';
 $string['archivetype'] = 'Archival method';
 $string['courseselectiontype'] = 'Course selection type';
 $string['coursecategory'] = 'Course category';
