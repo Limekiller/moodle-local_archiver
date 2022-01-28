@@ -43,6 +43,10 @@ class log_table extends \table_sql {
         return date("Y-m-d H:i:s", $task->time);
     }
 
+    public function col_courses($task) {
+        return implode("<br />", json_decode($task->courses, true));
+    }
+
     public function other_cols($colname, $task) {
         // For security reasons we don't want to show the password hash.
         if ($colname == 'status') {
@@ -59,8 +63,14 @@ class log_table extends \table_sql {
     public static function get_current_tasks() {
         global $DB;
 
+	// Get time created if version is 3.10 or higher
+	$timecreated = '';
+	if (get_config('version') >= 2020110908.00) {
+		$timecreated = 'timecreated,';
+	}
+
         $tasks = $DB->get_records_sql("
-            SELECT id, customdata, timecreated
+            SELECT id, $timecreated customdata
             FROM {task_adhoc}
             WHERE classname LIKE '%adhoc_archive_task%'"
         );

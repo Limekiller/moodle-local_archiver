@@ -23,6 +23,7 @@
  */
 
 require_once(dirname(__FILE__) . '/../../config.php');
+require_once(dirname(__FILE__) . '/lib.php');
 require "$CFG->libdir/tablelib.php";
 
 require_login();
@@ -43,11 +44,18 @@ $inprogresstasks = \local_archiver\log_table::get_current_tasks();
 if ($inprogresstasks) {
     echo html_writer::tag('h3', 'In progress jobs');
     $current_jobs_table = new html_table();
-    $current_jobs_table->head = ['Courses backed up', 'Time started'];
+    $current_jobs_table->head = ['Courses to back up', 'Time started'];
     foreach ($inprogresstasks as $task) {
         $customdata = json_decode($task->customdata, true);
-        $courses = $customdata['courses'];
-        $current_jobs_table->data[] = [$courses, date("Y-m-d H:i:s", $task->timecreated)];
+        $courses = json_decode($customdata['courses'], true);
+
+	$course_names = local_archiver_get_course_name_array($courses);
+
+	$date = 'Not available in version 3.9 or lower';
+	if ($task->timecreated) {
+	    $date = date("Y-m-d H:i:s", $task->timecreated);
+	}
+        $current_jobs_table->data[] = [implode("<br>", $course_names), $date];
     }
 
     echo html_writer::table($current_jobs_table);

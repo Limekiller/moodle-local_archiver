@@ -55,5 +55,6 @@ $string['dateoperator'] = 'Operator';
 
 $string['nocourseerror1'] = 'No courses were found from the given criteria! ';
 $string['nocourseerror2'] = 'Try using fuzzy matching by adding a % before and after the course name. (Ex: %Chemistry%)';
+$string['backuperror'] = 'Bakup failed.';
 $string['sftperror'] = 'Could not connect to SFTP server. Please check your SFTP credentials.';
 $string['googleoautherror'] = 'Google access token does not exist or could not be refreshed. Please re-grant account access in plugin settings.';

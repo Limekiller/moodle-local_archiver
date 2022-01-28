@@ -27,6 +27,7 @@ namespace local_archiver;
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/moodle2/backup_plan_builder.class.php');
 require_once($CFG->dirroot . '/course/externallib.php');
+require_once(dirname(__FILE__) . '/../lib.php');
 
 use local_archiver\google_oauth_manager;
 
@@ -56,9 +57,10 @@ class adhoc_archive_task extends \core\task\adhoc_task {
                 $fileinfo = $this->get_file_info_from_db($course);
                 $this->move_file($fileinfo, $course);
             } catch (\Exception $e) {
-                # Skip this course for archival.
-                # TODO: Log error to some persistent log
-                continue;
+                unlink($this->tempfolderdest . '.zip');
+                $DB->delete_records('task_adhoc', ['id' => $this->get_id()]);
+                $this->log_job_in_db($e->getMessage());
+                throw new \Exception(get_string('backuperror', 'local_archiver'));
             }
         }
 
@@ -84,13 +86,12 @@ class adhoc_archive_task extends \core\task\adhoc_task {
      * @return bool
      */
     private function make_backup($courseid) {
-
         $bc = new \backup_controller(\backup::TYPE_1COURSE,
             $courseid,
             \backup::FORMAT_MOODLE,
             \backup::INTERACTIVE_NO,
             \backup::MODE_GENERAL,
-            2);
+            get_admin()->id);
 
         $bc->execute_plan();
         $bc->destroy();
@@ -230,7 +231,10 @@ class adhoc_archive_task extends \core\task\adhoc_task {
         global $DB;
 
         $job = new \stdClass();
-        $job->courses = json_encode($this->courses);
+
+        $course_names = local_archiver_get_course_name_array($this->courses);
+        $job->courses = json_encode($course_names);
+
         $job->type = 'adhoc';
         $job->time = time();
         $job->message = $message;
